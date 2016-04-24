@@ -16,11 +16,14 @@ gulp.task('coffee', function () {
   return gulp.src(srcFile)
     .pipe(lint())
     .pipe(lint.reporter())
-    .pipe(cache(coffee())).on('error', util.log)
+    .pipe(cache(coffee()))
+    .on('error', function (err) {
+      this.emit('end');
+    })
     .pipe(concat(target))
     .pipe(gulp.dest(tarPath))
     .pipe(rename({suffix: '.min'}))
-    .pipe(uglify())
+    .pipe(uglify({output: {max_line_len: 64}}))
     .pipe(gulp.dest(tarPath));
 });
 
