@@ -5,4 +5,4 @@
   respond: (request) ->
     response: res
     data: request.data ||= ""
-).call(this)
+).call this
