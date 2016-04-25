@@ -13,39 +13,36 @@ global.game = () ->
     consts[i] = data[x] for i, x of map
     null
 
-  initContents = (data) ->
-    statics = data.statics
+  initContents = (data, s) ->
+    statics = s
     contents = data.contents
     players = data.players
     nextGenerate = data.nextGenerate
     generators = []
     for i in [0..consts.height-1]
       for j in [0..consts.width-1]
-        unless players[id]?
-          players[id] = (
-            i: i, j: j
-            duration: 0
-            strength: 1
-            dead: false
-          ) for id in [0..3] when contents[i][j] & mask.player(id)
+        players[id] ||= (
+          i: i, j: j
+          duration: 0
+          strength: 1
+          dead: false
+        ) for id in [0..3] when contents[i][j] & mask.player(id)
         generators.push i: i, j: j if statics[i][j] & mask.generator
     null
 
-  init = (requests, data) ->
-    initial = requests[0]
-    initConsts(initial)
+  init = (initial, data) ->
+    initConsts initial
     data ||=
-      statics: initial.static
       contents: initial.content
       players: []
       nextGenerate: consts.interval
-    initContents(data)
+    initContents data, initial.static
     null
 
   valid = (id, dir) ->
     p = players[id]
     dir == -1 || (dir >= -1 && dir < 4 &&
-    statics[p.i][p.j] & mask.wall(dir))
+    !(statics[p.i][p.j] & mask.wall(dir)))
 
   kill = (p, id) ->
     contents[p.i][p.j] &= ~mask.player(id)
@@ -53,8 +50,8 @@ global.game = () ->
 
   front = (i, j, dir) ->
     delta = direction dir
-    i: (i + delta.i + height) % height
-    j: (j + delta.j + width) % width
+    i: (i + delta.i + consts.height) % consts.height
+    j: (j + delta.j + consts.width) % consts.width
 
   checkValid = (p, id, actions) ->
     dir = actions[id].action
@@ -80,7 +77,7 @@ global.game = () ->
   fight = (i, j) ->
     fighters = ([p, id] for p, id in players when !p.dead &&
     contents[i][j] & mask.player(id))
-    return if fighters.length == 0
+    return if fighters.length <= 1
     loot = winners = max = 0
     (max = f[0].strength) for f in fighters when f[0].strength > max
     for f in fighters
@@ -116,13 +113,11 @@ global.game = () ->
       p.strength -= consts.enhance
 
   nextTurn = (actions) ->
-    lives = (p for p in players when !p.dead)
-
-    checkValid p, id, actions for p, id in lives
-    move p, id, actions[id].action for p, id in lives
-    fight p.i, p.j for p, id in lives
+    checkValid p, id, actions for p, id in players when !p.dead
+    move p, id, actions[id].action for p, id in players when !p.dead
+    fight p.i, p.j for p, id in players when !p.dead
     generate() if --nextGenerate == 0
-    eat p, id for p, id in lives
+    eat p, id for p, id in players when !p.dead
 
     lives = (p for p in players when !p.dead)
     if lives.length == 1
@@ -142,3 +137,5 @@ global.game = () ->
   exports =
     init: init
     getData: getData
+    nextTurn: nextTurn
+    valid: valid
