@@ -1,4 +1,4 @@
-global.game = () ->
+global.game = (initial, data) ->
   statics = contents = players =
   generators = nextGenerate = null
   consts = {}
@@ -134,8 +134,9 @@ global.game = () ->
     players: players
     nextGenerate: nextGenerate
 
+  init initial, data
+
   exports =
-    init: init
     getData: getData
     nextTurn: nextTurn
     valid: valid

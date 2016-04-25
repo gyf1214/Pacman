@@ -1,15 +1,22 @@
 global.judge = (() ->
-  me = request = game = data = null
+  me = data = request = game = nav = null
+
+  getData = (req) ->
+    request = req
+    request.data ||= null
+    data = JSON.parse request.data
+    data ||= {}
+    null
 
   initGame = () ->
     me = request.requests[0].id
-    game = global.game()
-    request.data ||= null
-    data = JSON.parse request.data
-    game.init request.requests[0], data
+    game = global.game request.requests[0], data.game
     if (len = request.requests.length) > 1
       game.nextTurn request.requests[len - 1]
-    data = game.getData()
+    null
+
+  initNav = () ->
+    nav = global.navigator data.navigator
     null
 
   random = () ->
@@ -20,11 +27,16 @@ global.judge = (() ->
     tauntText: "Hello World!"
 
   respond = (req) ->
-    request = req
+    getData(req)
     initGame()
+    initNav()
     response: random()
+    data =
+      game: game.getData()
+      navigator: nav.getData()
     data: JSON.stringify data
     debug: JSON.stringify data
 
-  respond: respond
+  exports =
+    respond: respond
 )()
