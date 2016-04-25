@@ -24,6 +24,7 @@ gulp.task('coffee', function () {
     .pipe(gulp.dest(tarPath))
     .pipe(rename({suffix: '.min'}))
     .pipe(uglify({output: {max_line_len: 64}}))
+    .on('error', util.log)
     .pipe(gulp.dest(tarPath));
 });
 
