@@ -11,8 +11,7 @@ var readline = require("readline")
   exec = require("child_process").exec,
   loop = true,
   wait = true,
-  data = [],
-  requests = [],
+  inputs = [],
   config = require("./config"),
   scripts = config.scripts,
   turn = 0,
@@ -99,10 +98,11 @@ var nextTurn = function() {
           debug(out);
           debug();
           responses[i] = out.response;
-          data[i] = out.data
+          if (out.data !== undefined || out.data !== null) inputs[i].data = out.data
+          inputs[i].responses.push(out.response);
           if (finished == 4) {
             ++turn;
-            for (var _ = 0; _ < 4; ++_) requests[_].push(responses);
+            for (var _ = 0; _ < 4; ++_) inputs[_].requests.push(responses);
             loop = !game.nextTurn(responses) && turn <= 100;
             print();
             if (wait) {
@@ -115,11 +115,10 @@ var nextTurn = function() {
           }
         }
       });
-      var input = { requests: requests[i],data: data[i] };
       debug("player " + i + " input:");
-      debug(input);
+      debug(inputs[i]);
       debug();
-      child.stdin.write(JSON.stringify(input));
+      child.stdin.write(JSON.stringify(inputs[i]));
       child.stdin.end();
     })(i);
   }
@@ -156,8 +155,7 @@ print();
 for (var i = 0; i < 4; ++i) {
   x = JSON.parse(JSON.stringify(config.game));
   x.id = i;
-  requests[i] = [];
-  requests[i][0] = x;
+  inputs[i] = { requests: [x], responses: [] };
 }
 
 readline.on('close', function () {
