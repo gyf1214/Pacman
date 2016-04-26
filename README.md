@@ -4,6 +4,14 @@ Pacman AI for [botzone.org](http://www.botzone.org)
 
 Homework of Practice on Programming
 
+## Progress ##
+
+Game simulation is finished
+
+AI designing is not started yet, it now walks randomly
+
+Offline judge is finished, base on simulation
+
 ## Build ##
 
 `npm install` to install dependencies first
@@ -11,6 +19,8 @@ Homework of Practice on Programming
 `gulp coffee`, or `gulp watch` to build automatically
 
 ## How to Use Built-in Judge ##
+
+Build first
 
 Check `scripts/config.js` to config for the game:
 
