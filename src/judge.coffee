@@ -30,13 +30,13 @@ global.judge = (() ->
     getData(req)
     initGame()
     initNav()
-    response: random()
     data =
       game: game.getData()
       navigator: nav.getData()
+    response: random()
     data: JSON.stringify data
     debug: JSON.stringify data
 
   exports =
     respond: respond
-)()
+)

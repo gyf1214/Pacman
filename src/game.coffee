@@ -125,8 +125,10 @@ global.game = (initial, data) ->
       cnt = 0
       for i in [0..consts.height-1]
         for j in [0..consts.width-1]
-          ++cnt if contents[i][j] & mask.small
-      p.strength += p
+          if contents[i][j] & mask.small
+            ++cnt
+            contents[i][j] &= ~mask.small
+      p.strength += cnt
     lives.length == 1
 
   getData = () ->
@@ -134,9 +136,14 @@ global.game = (initial, data) ->
     players: players
     nextGenerate: nextGenerate
 
+  getInfo = () ->
+    consts: consts
+    statics: statics
+
   init initial, data
 
   exports =
     getData: getData
     nextTurn: nextTurn
     valid: valid
+    getInfo: getInfo

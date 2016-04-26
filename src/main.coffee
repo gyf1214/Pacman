@@ -6,6 +6,7 @@ process.stdin.on 'data', (chunk) ->
   input += chunk
   null
 process.stdin.on 'end', () ->
+  judge = global.judge()
   request = JSON.parse input
   console.log JSON.stringify judge.respond(request)
   null
