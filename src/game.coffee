@@ -1,4 +1,4 @@
-global.game = (initial, data) ->
+global.game = (initial, data, turn) ->
   statics = contents = players =
   generators = nextGenerate = delta = null
   consts = {}
@@ -107,13 +107,13 @@ global.game = (initial, data) ->
     c = contents[p.i][p.j]
     unless c & ~mask.player(id) & mask.players
       if c & mask.small
-        p.mask = mask.small
-        delta.eatFruits.push p
+        t = i: p.i, j: p.j, mask: mask.small
+        delta.eatFruits.push t
         contents[p.i][p.j] &= ~mask.small
         ++p.strength
       else if c & mask.large
-        p.mask = mask.large
-        delta.eatFruits.push p
+        t = i: p.i, j: p.j, mask: mask.small
+        delta.eatFruits.push t
         contents[p.i][p.j] &= ~mask.large
         p.strength += consts.enhance if p.duration == 0
         p.duration += consts.duration
@@ -121,6 +121,7 @@ global.game = (initial, data) ->
       p.strength -= consts.enhance
 
   nextTurn = (actions) ->
+    ++turn
     delta =
       players: JSON.parse JSON.stringify players
       newFruits: []
@@ -142,11 +143,12 @@ global.game = (initial, data) ->
         for j in [0..consts.width-1]
           if contents[i][j] & mask.small
             ++cnt
-            contents[i][j] &= ~mask.small
       p.strength += cnt
-    lives.length == 1
+    lives.length == 1 || turn >= maxTurn
 
   popState = () ->
+    return if backtrack.length == 0
+    --turn
     delta = backtrack.pop()
     contents[p.i][p.j] &= ~mask.player(id) for p, id in players when !p.dead
     players = delta.players
@@ -155,6 +157,7 @@ global.game = (initial, data) ->
     if nextGenerate++ == consts.interval
       contents[f.i][f.j] &= ~mask.small for f in delta.newFruits
       nextGenerate = 1
+    null
 
   getData = () ->
     contents: contents
@@ -164,6 +167,12 @@ global.game = (initial, data) ->
   getInfo = () ->
     consts: consts
     statics: statics
+    turn: turn
+
+  rank = (id) ->
+    ret = 0
+    ++ret for p in players when p.strength < players[id].strength
+    ret
 
   init initial, data
 
@@ -173,3 +182,5 @@ global.game = (initial, data) ->
     popState: popState
     valid: valid
     getInfo: getInfo
+    rank: rank
+    front: front

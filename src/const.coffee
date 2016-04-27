@@ -16,3 +16,5 @@ global.direction = (id) ->
   dy = [0, -1, 0, 1, 0, -1, 1, 1, -1]
   j: dx[id + 1]
   i: dy[id + 1]
+
+global.maxTurn = 100

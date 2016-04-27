@@ -15,8 +15,7 @@ var readline = require("readline")
   inputs = [],
   config = require("./config"),
   scripts = config.scripts,
-  turn = 0,
-  game = global.game(config.game),
+  game = global.game(config.game, null, 0),
   last = "n";
 
 var print = function () {
@@ -28,7 +27,7 @@ var print = function () {
     contents = data.contents,
     i, j, k;
 
-  console.log("Turn %d:", turn);
+  console.log("Turn %d:", info.turn);
   console.log("Next Generate: %d", data.nextGenerate);
   for (i = 0; i < 4; ++i) {
     var p = data.players[i];
@@ -77,7 +76,7 @@ var debug = function (data) {
   if (util.isString(data) || util.isBuffer(data)) {
     append(logPath, data);
   } else {
-    append(logPath, util.inspect(data, { depth: null }));
+    append(logPath, JSON.stringify(data));
   }
   append(logPath, "\n");
 }
@@ -85,6 +84,7 @@ var debug = function (data) {
 var nextTurn = function() {
   var finished = 0;
   var responses = {};
+  var turn = game.getInfo().turn;
 
   debug("turn " + turn + ":");
   debug();
@@ -107,9 +107,8 @@ var nextTurn = function() {
             if (out.data !== undefined || out.data !== null) inputs[i].data = out.data
             inputs[i].responses.push(out.response);
             if (finished == 4) {
-              ++turn;
               for (var _ = 0; _ < 4; ++_) inputs[_].requests.push(responses);
-              loop = !game.nextTurn(responses) && turn < 100;
+              loop = !game.nextTurn(responses);
               print();
               if (wait) {
                 readline.question('? ', answer);
@@ -132,11 +131,6 @@ var nextTurn = function() {
 }
 
 var popState = function () {
-  if (turn == 0) {
-    console.log("Error!");
-    return;
-  }
-  --turn;
   game.popState();
   print();
 }
