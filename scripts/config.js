@@ -27,5 +27,5 @@ var game = exports.game =
     width: 8 };
 
 var scripts = exports.scripts =
-  [ "node bin/main.js", "node bin/main.js",
-    "node bin/main.js", "node bin/main.js" ];
+  [ "node bin/main.min.js", "bin/sample",
+    "bin/sample", "bin/sample" ];

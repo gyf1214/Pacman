@@ -85,42 +85,44 @@ var nextTurn = function() {
   var responses = {};
 
   for (var i = 0; i < 4; ++i) {
-    (function (i) {
-      var child = exec(scripts[i], function (err, stdout, stderr) {
-        if (err !== null) {
-          console.log("error for player %d in turn %d!", i, turn);
-          console.log(stderr);
-          readline.close();
-        } else {
-          ++finished;
-          var out = JSON.parse(stdout);
-          debug("player " + i + " output:");
-          debug(out);
-          debug();
-          responses[i] = out.response;
-          if (out.data !== undefined || out.data !== null) inputs[i].data = out.data
-          inputs[i].responses.push(out.response);
-          if (finished == 4) {
-            ++turn;
-            for (var _ = 0; _ < 4; ++_) inputs[_].requests.push(responses);
-            loop = !game.nextTurn(responses) && turn <= 100;
-            print();
-            if (wait) {
-              readline.question('? ', answer);
-            } else if (loop) {
-              nextTurn(wait);
-            } else {
-              readline.close();
+    if (!game.getData().players[i].dead) {
+      (function (i) {
+        var child = exec(scripts[i], function (err, stdout, stderr) {
+          if (err !== null) {
+            console.log("error for player %d in turn %d!", i, turn);
+            console.log(stderr);
+            readline.close();
+          } else {
+            ++finished;
+            var out = JSON.parse(stdout);
+            debug("player " + i + " output:");
+            debug(out);
+            debug();
+            responses[i] = out.response;
+            if (out.data !== undefined || out.data !== null) inputs[i].data = out.data
+            inputs[i].responses.push(out.response);
+            if (finished == 4) {
+              ++turn;
+              for (var _ = 0; _ < 4; ++_) inputs[_].requests.push(responses);
+              loop = !game.nextTurn(responses) && turn < 100;
+              print();
+              if (wait) {
+                readline.question('? ', answer);
+              } else if (loop) {
+                nextTurn(wait);
+              } else {
+                readline.close();
+              }
             }
           }
-        }
-      });
-      debug("player " + i + " input:");
-      debug(inputs[i]);
-      debug();
-      child.stdin.write(JSON.stringify(inputs[i]));
-      child.stdin.end();
-    })(i);
+        });
+        debug("player " + i + " input:");
+        debug(inputs[i]);
+        debug();
+        child.stdin.write(JSON.stringify(inputs[i]));
+        child.stdin.end();
+      })(i);
+    }
   }
 }
 
