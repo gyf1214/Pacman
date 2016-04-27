@@ -42,9 +42,12 @@ gulp.task('coffee', function () {
   var main = gulp.src(mainFile),
     lib = gulp.src(libFile);
 
-  return compress(merge(coffeefy(main), coffeefy(lib, libTarget))
+  var lib = coffeefy(lib, libTarget),
+    target = compress(merge(coffeefy(main), lib)
           .pipe(concat(mainTarget))
           .pipe(gulp.dest(tarPath)));
+
+  return merge(compress(lib), target);
 });
 
 gulp.task('watch', function (){

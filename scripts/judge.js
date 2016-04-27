@@ -1,4 +1,4 @@
-require('../bin/lib');
+require('../bin/lib.min');
 
 var readline = require("readline")
   .createInterface({
