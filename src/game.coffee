@@ -1,7 +1,8 @@
 global.game = (initial, data) ->
   statics = contents = players =
-  generators = nextGenerate = null
+  generators = nextGenerate = delta = null
   consts = {}
+  backtrack = []
 
   initConsts = (data) ->
     map =
@@ -49,9 +50,9 @@ global.game = (initial, data) ->
     p.dead = true
 
   front = (i, j, dir) ->
-    delta = direction dir
-    i: (i + delta.i + consts.height) % consts.height
-    j: (j + delta.j + consts.width) % consts.width
+    d = direction dir
+    i: (i + d.i + consts.height) % consts.height
+    j: (j + d.j + consts.width) % consts.width
 
   checkValid = (p, id, actions) ->
     dir = actions[id].action
@@ -59,6 +60,7 @@ global.game = (initial, data) ->
     unless valid id, dir
       p.strength = 0
       kill p, id
+
     else
       pos = front p.i, p.j, dir
       target = contents[pos.i][pos.j]
@@ -96,16 +98,22 @@ global.game = (initial, data) ->
     for g in generators
       for dir in [0..7]
         t = front g.i, g.j, dir
-        contents[t.i][t.j] |= mask.small unless statics[t.i][t.j] &
-        mask.generator || (contents[t.i][t.j] & (mask.small | mask.big))
+        unless statics[t.i][t.j] & mask.generator ||
+        (contents[t.i][t.j] & (mask.small | mask.big))
+          contents[t.i][t.j] |= mask.small
+          delta.newFruits.push t
 
   eat = (p, id) ->
     c = contents[p.i][p.j]
     unless c & ~mask.player(id) & mask.players
       if c & mask.small
+        p.mask = mask.small
+        delta.eatFruits.push p
         contents[p.i][p.j] &= ~mask.small
         ++p.strength
       else if c & mask.large
+        p.mask = mask.large
+        delta.eatFruits.push p
         contents[p.i][p.j] &= ~mask.large
         p.strength += consts.enhance if p.duration == 0
         p.duration += consts.duration
@@ -113,11 +121,18 @@ global.game = (initial, data) ->
       p.strength -= consts.enhance
 
   nextTurn = (actions) ->
+    delta =
+      players: JSON.parse JSON.stringify players
+      newFruits: []
+      eatFruits: []
+
     checkValid p, id, actions for p, id in players when !p.dead
     move p, id, actions[id].action for p, id in players when !p.dead
     fight p.i, p.j for p, id in players when !p.dead
     generate() if --nextGenerate == 0
     eat p, id for p, id in players when !p.dead
+
+    backtrack.push delta
 
     lives = (p for p in players when !p.dead)
     if lives.length == 1
@@ -130,6 +145,16 @@ global.game = (initial, data) ->
             contents[i][j] &= ~mask.small
       p.strength += cnt
     lives.length == 1
+
+  popState = () ->
+    delta = backtrack.pop()
+    contents[p.i][p.j] &= ~mask.player(id) for p, id in players when !p.dead
+    players = delta.players
+    contents[p.i][p.j] |= mask.player(id) for p, id in players when !p.dead
+    contents[f.i][f.j] |= f.mask for f in delta.eatFruits
+    if nextGenerate++ == consts.interval
+      contents[f.i][f.j] &= ~mask.small for f in delta.newFruits
+      nextGenerate = 1
 
   getData = () ->
     contents: contents
@@ -145,5 +170,6 @@ global.game = (initial, data) ->
   exports =
     getData: getData
     nextTurn: nextTurn
+    popState: popState
     valid: valid
     getInfo: getInfo

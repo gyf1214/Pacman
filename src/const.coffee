@@ -5,6 +5,11 @@ global.mask =
   large: 1 << 5
   wall: (id) -> 1 << id
   generator: 1 << 4
+  eatSmall: 1 << 0
+  eatLarge: 1 << 1
+  powerDue: 1 << 2
+  die: 1 << 3
+  error: 1 << 4
 
 global.direction = (id) ->
   dx = [0, 0, 1, 0, -1, 1, 1, -1, -1]

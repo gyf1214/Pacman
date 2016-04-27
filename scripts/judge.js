@@ -5,7 +5,8 @@ var readline = require("readline")
     input: process.stdin,
     output: process.stdout
   }),
-  append = require("fs").appendFileSync,
+  fs = require("fs"),
+  append = fs.appendFileSync,
   util = require("util"),
   logPath = "tmp/judge.log",
   exec = require("child_process").exec,
@@ -28,6 +29,7 @@ var print = function () {
     i, j, k;
 
   console.log("Turn %d:", turn);
+  console.log("Next Generate: %d", data.nextGenerate);
   for (i = 0; i < 4; ++i) {
     var p = data.players[i];
     console.log("[Player %d @(%d, %d) | strength: %d | duration: %d | %s]",
@@ -84,6 +86,9 @@ var nextTurn = function() {
   var finished = 0;
   var responses = {};
 
+  debug("turn " + turn + ":");
+  debug();
+
   for (var i = 0; i < 4; ++i) {
     if (!game.getData().players[i].dead) {
       (function (i) {
@@ -122,8 +127,18 @@ var nextTurn = function() {
         child.stdin.write(JSON.stringify(inputs[i]));
         child.stdin.end();
       })(i);
-    }
+    } else ++finished;
   }
+}
+
+var popState = function () {
+  if (turn == 0) {
+    console.log("Error!");
+    return;
+  }
+  --turn;
+  game.popState();
+  print();
 }
 
 var answer = function(r) {
@@ -139,6 +154,9 @@ var answer = function(r) {
     nextTurn();
   } else if (r === "q") {
     readline.close();
+  } else if (r === "l") {
+    popState();
+    readline.question('? ', answer);
   } else {
     console.log("negative input!");
     readline.question('? ', answer);
@@ -146,7 +164,9 @@ var answer = function(r) {
   last = r;
 }
 
-require("fs").unlinkSync(logPath);
+if (fs.existsSync(logPath)) {
+  fs.unlinkSync(logPath);
+}
 debug("test case: " + new Date(Date.now()));
 debug();
 debug("config:");
