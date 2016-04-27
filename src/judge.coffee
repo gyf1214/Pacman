@@ -20,13 +20,23 @@ global.judge = (() ->
     nav = global.navigator data.navigator, game
     null
 
+  pick = (s) ->
+    valids = (dir for dir in [-1..3] when game.valid me, dir)
+    [max, best] = [-1, -1]
+    for dir in valids
+      ans = s.evaluate dir
+      # console.log ans
+      [max, best] = [ans, dir] if ans > max
+    best
+
   respond = (req) ->
     getData(req)
     initGame()
     initNav()
     simulator = global.simulator game, me
+    greedy = global.greedy game, nav, me
     response =
-      action: simulator.pick()
+      action: pick greedy
       tauntText: ""
     data =
       game: game.getData()

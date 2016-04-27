@@ -47,3 +47,4 @@ global.navigator = (distance, game) ->
   exports =
     init: init
     getData: getData
+    get: get

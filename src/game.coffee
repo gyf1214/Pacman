@@ -167,12 +167,22 @@ global.game = (initial, data, turn) ->
   getInfo = () ->
     consts: consts
     statics: statics
+    generators: generators
     turn: turn
 
   rank = (id) ->
     ret = 0
     ++ret for p in players when p.strength < players[id].strength
     ret
+
+  getFruits = () ->
+    small = large = []
+    for i in [0..consts.height-1]
+      for j in [0..consts.width-1]
+        small.push {i:i, j:j} if contents[i][j] & mask.small
+        large.push {i:i, j:j} if contents[i][j] & mask.large
+    small: small
+    large: large
 
   init initial, data
 
@@ -182,5 +192,6 @@ global.game = (initial, data, turn) ->
     popState: popState
     valid: valid
     getInfo: getInfo
+    getFruits: getFruits
     rank: rank
     front: front

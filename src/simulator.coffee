@@ -26,15 +26,8 @@ global.simulator = (game, me) ->
     ans += randomPlay dir while times--
     ans
 
-  pick = () ->
-    valids = (dir for dir in [-1..3] when game.valid me, dir)
-    [max, best] = [-1, -1]
-    for i in valids
-      ans = simulate i
-      [max, best] = [ans, i] if ans > max
-    best
-
   exports =
     random: random
+    randomMove: randomMove
     simulate: simulate
-    pick: pick
+    evaluate: simulate
