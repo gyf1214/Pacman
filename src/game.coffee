@@ -112,7 +112,7 @@ global.game = (initial, data, turn) ->
         contents[p.i][p.j] &= ~mask.small
         ++p.strength
       else if c & mask.large
-        t = i: p.i, j: p.j, mask: mask.small
+        t = i: p.i, j: p.j, mask: mask.large
         delta.eatFruits.push t
         contents[p.i][p.j] &= ~mask.large
         p.strength += consts.enhance if p.duration == 0

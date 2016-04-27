@@ -89,6 +89,10 @@ var nextTurn = function() {
   debug("turn " + turn + ":");
   debug();
 
+  debug("last game: ")
+  debug(JSON.stringify(game.getData()));
+  debug();
+
   for (var i = 0; i < 4; ++i) {
     if (!game.getData().players[i].dead) {
       (function (i) {
