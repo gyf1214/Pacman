@@ -8,7 +8,7 @@ Homework of Practice on Programming
 
 Game simulation is finished
 
-AI designing is not started yet, it now walks randomly
+Simple greedy, evaluation is still unfinished
 
 Offline judge is finished, base on simulation
 
