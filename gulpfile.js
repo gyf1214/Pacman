@@ -33,7 +33,7 @@ var coffeefy = function(src, target) {
 var compress = function(src) {
   return src
     .pipe(rename({suffix: '.min'}))
-    .pipe(uglify({output: {max_line_len: 64}}))
+    .pipe(uglify())
     .on('error', util.log)
     .pipe(gulp.dest(tarPath));
 }
