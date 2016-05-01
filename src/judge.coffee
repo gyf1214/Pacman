@@ -21,7 +21,8 @@ global.judge = (() ->
     null
 
   pick = (s) ->
-    valids = (dir for dir in [-1..3] when game.valid me, dir)
+    valids = (dir for dir in [0..3] when game.valid me, dir)
+    valids.push -1
     [max, best] = [-1, -1]
     for dir in valids
       ans = s.evaluate dir

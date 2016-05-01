@@ -1,18 +1,24 @@
 global.greedy = (game, nav, me) ->
   p = i = d = f = g = null
 
-  actions = sum = cnt = null
+  actions = sum = cnt = ans = null
 
   dMix = 10
   sMix = 0.2
-  lMix = 0.6
+  lMix = 0.3
   gMix = 0.2
+
+  rev = (a) ->
+    return 0 if a == 0
+    1 / a
 
   fruitVal = () ->
     f = game.getFruits()
     ret = 0
-    (ret += sMix / (1 + nav.get(p, s))) for s in f.small
-    (ret += lMix / (1 + nav.get(p, s))) for s in f.large
+    for s in f.small
+      (ret += sMix * rev(nav.get(p, s)))
+    for s in f.large
+      (ret += lMix * rev(nav.get(p, s)))
     ret
 
   generatorVal = () ->
@@ -37,13 +43,14 @@ global.greedy = (game, nav, me) ->
     d = game.getData()
     ret = strengthVal() + fruitVal() + generatorVal()
     game.popState()
+    # console.log ret
     ret
 
   dfs = (i) ->
     i++ while actions[i]?
     if i >= 4
-      sum += value()
-      ++cnt
+      t = value()
+      ans = if ans? && ans <= t then ans else t
     else
       valids = (dir for dir in [-1..3] when game.valid i, dir)
       for dir in valids
@@ -53,12 +60,11 @@ global.greedy = (game, nav, me) ->
     null
 
   evaluate = (dir) ->
-    sum = 0
-    cnt = 0
+    ans = null
     actions = []
     actions[me] = dir
     dfs 0
-    sum / cnt
+    ans
 
   exports =
     evaluate: evaluate
