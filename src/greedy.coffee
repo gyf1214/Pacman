@@ -27,7 +27,7 @@ global.greedy = (game, nav, me) ->
     for s in g
       for dir in [0..7]
         t = nav.get p, game.front s.i, s.j, dir
-        ret += gMix / (1 + t) if t?
+        ret += gMix * rev(1 + t) if t?
     ret / d.nextGenerate
 
   strengthVal = () ->
