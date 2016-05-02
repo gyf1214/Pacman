@@ -14,7 +14,7 @@ global.greedy = (game, nav, me) ->
 
   rev = (a) ->
     return 0 if a == 0
-    1 / a
+    1 / a / a
 
   fruitVal = () ->
     f = game.getFruits()
@@ -31,7 +31,7 @@ global.greedy = (game, nav, me) ->
     for s in g
       for dir in [0..7]
         t = nav.get p, game.front s.i, s.j, dir
-        ret += gMix / (1 + t) if t?
+        ret += gMix * rev(1 + t) if t?
     ret / d.nextGenerate
 
   strengthVal = () ->
