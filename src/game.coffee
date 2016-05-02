@@ -99,7 +99,7 @@ global.game = (initial, data, turn) ->
       for dir in [0..7]
         t = front g.i, g.j, dir
         unless statics[t.i][t.j] & mask.generator ||
-        (contents[t.i][t.j] & (mask.small | mask.big))
+        (contents[t.i][t.j] & (mask.small | mask.large))
           contents[t.i][t.j] |= mask.small
           delta.newFruits.push t
 
