@@ -40,8 +40,8 @@ global.game = (initial, data, turn) ->
     initContents data, initial.static
     null
 
-  valid = (id, dir) ->
-    p = players[id]
+  valid = (id, dir, p) ->
+    p ||= players[id]
     dir == -1 || (dir >= -1 && dir < 4 &&
     !(statics[p.i][p.j] & mask.wall(dir)))
 
@@ -60,7 +60,6 @@ global.game = (initial, data, turn) ->
     unless valid id, dir
       p.strength = 0
       kill p, id
-
     else
       pos = front p.i, p.j, dir
       target = contents[pos.i][pos.j]
@@ -98,7 +97,7 @@ global.game = (initial, data, turn) ->
     for g in generators
       for dir in [0..7]
         t = front g.i, g.j, dir
-        unless statics[t.i][t.j] & mask.generator ||
+        unless (statics[t.i][t.j] & mask.generator) ||
         (contents[t.i][t.j] & (mask.small | mask.large))
           contents[t.i][t.j] |= mask.small
           delta.newFruits.push t
