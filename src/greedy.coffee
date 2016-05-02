@@ -62,8 +62,10 @@ global.greedy = (game, nav, me) ->
   mont = (i, player) ->
     if i >= depth
       logger actions
-      t = 0
-      t += valueMont() for i in [1..times]
+      t = null
+      for i in [1..times]
+        x = valueMont()
+        t = if t? && t <= x then t else x
       logger t
       ans = if ans? && ans >= t then ans else t
     else
