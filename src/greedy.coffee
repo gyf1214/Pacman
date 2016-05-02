@@ -3,7 +3,11 @@ global.greedy = (game, nav, me) ->
 
   actions = sum = cnt = ans = null
 
-  dMix = 10
+  depth = 3
+
+  times = 100
+
+  dMix = 5
   sMix = 0.2
   lMix = 0.3
   gMix = 0.2
@@ -33,38 +37,68 @@ global.greedy = (game, nav, me) ->
   strengthVal = () ->
     p = d.players[me]
     ret = p.strength
-    ret -= dMix * (1 - p.duration / i.consts.duration) if p.duration > 0
+    ret -= dMix if p.duration > 0
     ret
 
   value = () ->
-    t = (action: i for i in actions)
-    game.nextTurn t
     i = game.getInfo()
     d = game.getData()
-    ret = strengthVal() + fruitVal() + generatorVal()
+    strengthVal() + fruitVal() + generatorVal()
+
+  valueGreed = () ->
+    t = (action: i for i in actions)
+    game.nextTurn t
+    ret = value()
     game.popState()
-    # console.log ret
     ret
+
+  valueMont = () ->
+    simulator = global.simulator game, me
+    simulator.randomMove dir for dir in actions
+    ret = value()
+    game.popState() for dir in actions
+    ret
+
+  mont = (i, player) ->
+    if i >= depth
+      logger actions
+      t = 0
+      t += valueMont() for i in [1..times]
+      logger t
+      ans = if ans? && ans >= t then ans else t
+    else
+      for dir in [-1..3] when game.valid null, dir, player
+        actions[i] = dir
+        mont i + 1, game.front(player.i, player.j, dir)
+        actions[i] = null
+    null
 
   dfs = (i) ->
     i++ while actions[i]?
     if i >= 4
-      t = value()
+      t = valueGreed()
       ans = if ans? && ans <= t then ans else t
     else
-      valids = (dir for dir in [-1..3] when game.valid i, dir)
-      for dir in valids
+      for dir in [-1..3] when game.valid i, dir
         actions[i] = dir
         dfs i + 1
         actions[i] = null
     null
 
-  evaluate = (dir) ->
+  evalGreed = (dir) ->
     ans = null
     actions = []
     actions[me] = dir
     dfs 0
     ans
 
+  evalMont = (dir) ->
+    ans = null
+    actions = [dir]
+    player = game.getData().players[me]
+    t = game.front player.i, player.j, dir
+    mont 1, t
+    ans
+
   exports =
-    evaluate: evaluate
+    evaluate: evalMont

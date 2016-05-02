@@ -40,8 +40,8 @@ global.game = (initial, data, turn) ->
     initContents data, initial.static
     null
 
-  valid = (id, dir) ->
-    p = players[id]
+  valid = (id, dir, p) ->
+    p ||= players[id]
     dir == -1 || (dir >= -1 && dir < 4 &&
     !(statics[p.i][p.j] & mask.wall(dir)))
 
