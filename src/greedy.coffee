@@ -4,13 +4,13 @@ global.greedy = (game, nav, me) ->
   actions = sum = cnt = ans = null
 
   dMix = 10
-  sMix = 0.2
-  lMix = 0.3
+  sMix = 0.1
+  lMix = 0.2
   gMix = 0.2
 
   rev = (a) ->
     return 0 if a == 0
-    1 / a / a
+    1 / a
 
   fruitVal = () ->
     f = game.getFruits()
