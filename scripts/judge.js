@@ -97,9 +97,9 @@ var nextTurn = function() {
     if (!game.getData().players[i].dead) {
       (function (i) {
         var child = exec(scripts[i], function (err, stdout, stderr) {
+          console.log(stderr);
           if (err !== null) {
             console.log("error for player %d in turn %d!", i, turn);
-            console.log(stderr);
             readline.close();
           } else {
             ++finished;
