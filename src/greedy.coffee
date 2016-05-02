@@ -8,13 +8,13 @@ global.greedy = (game, nav, me) ->
   times = 500
 
   dMix = 5
-  sMix = 0.2
-  lMix = 0.3
-  gMix = 0.2
+  sMix = 0.1
+  lMix = 0.1
+  gMix = 0.1
 
   rev = (a) ->
     return 0 if a == 0
-    1 / a / a
+    1 / a
 
   fruitVal = () ->
     f = game.getFruits()
@@ -31,13 +31,13 @@ global.greedy = (game, nav, me) ->
     for s in g
       for dir in [0..7]
         t = nav.get p, game.front s.i, s.j, dir
-        ret += gMix * rev(1 + t) if t?
+        ret += gMix / (1 + t) / (1 + t) if t?
     ret / d.nextGenerate
 
   strengthVal = () ->
     p = d.players[me]
     ret = p.strength
-    ret -= dMix if p.duration > 0
+    ret -= dMix * i.consts.duration / p.duration if p.duration > 0
     ret
 
   value = () ->
