@@ -3,9 +3,9 @@ global.greedy = (game, nav, me) ->
 
   actions = sum = cnt = ans = null
 
-  depth = 3
+  depth = 2
 
-  times = 100
+  times = 500
 
   dMix = 5
   sMix = 0.2
