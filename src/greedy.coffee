@@ -10,7 +10,7 @@ global.greedy = (game, nav, me) ->
 
   rev = (a) ->
     return 0 if a == 0
-    1 / a
+    1 / a / a
 
   fruitVal = () ->
     f = game.getFruits()
