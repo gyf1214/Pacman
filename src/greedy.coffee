@@ -3,18 +3,18 @@ global.greedy = (game, nav, me) ->
 
   actions = sum = cnt = ans = null
 
-  depth = 2
+  depth = 3
 
   times = 500
 
-  dMix = 5
-  sMix = 0.1
-  lMix = 0.1
-  gMix = 0.1
+  dMix = 8
+  sMix = 0.9
+  lMix = 0.9
+  gMix = 0.9
 
   rev = (a) ->
     return 0 if a == 0
-    1 / a
+    1 / (1 + a)
 
   fruitVal = () ->
     f = game.getFruits()
@@ -37,7 +37,7 @@ global.greedy = (game, nav, me) ->
   strengthVal = () ->
     p = d.players[me]
     ret = p.strength
-    ret -= dMix * i.consts.duration / p.duration if p.duration > 0
+    ret -= dMix if p.duration > 0
     ret
 
   value = () ->
@@ -61,13 +61,12 @@ global.greedy = (game, nav, me) ->
 
   mont = (i, player) ->
     if i >= depth
-      logger actions
       t = null
       for i in [1..times]
         x = valueMont()
+        return if x <= ans
         t = if t? && t <= x then t else x
-      logger t
-      ans = if ans? && ans >= t then ans else t
+      ans = t
     else
       for dir in [-1..3] when game.valid null, dir, player
         actions[i] = dir
@@ -95,7 +94,7 @@ global.greedy = (game, nav, me) ->
     ans
 
   evalMont = (dir) ->
-    ans = null
+    ans = 0
     actions = [dir]
     player = game.getData().players[me]
     t = game.front player.i, player.j, dir
