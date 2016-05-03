@@ -175,7 +175,8 @@ global.game = (initial, data, turn) ->
     ret
 
   getFruits = () ->
-    small = large = []
+    small = []
+    large = []
     for i in [0..consts.height-1]
       for j in [0..consts.width-1]
         small.push {i:i, j:j} if contents[i][j] & mask.small
