@@ -102,4 +102,4 @@ global.greedy = (game, nav, me) ->
     ans
 
   exports =
-    evaluate: evalGreed
+    evaluate: evalMont
