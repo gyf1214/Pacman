@@ -95,9 +95,11 @@ var nextTurn = function() {
 
   for (var i = 0; i < 4; ++i) {
     if (!game.getData().players[i].dead) {
-      (function (i) {
+      (function (i, time) {
         var child = exec(scripts[i], function (err, stdout, stderr) {
-          process.stderr.write(stderr);
+          debug("player " + i + " return in " + (Date.now() - time) + " ms")
+          debug("player " + i + " stderr:");
+          debug(stderr);
           if (err !== null) {
             console.log("error for player %d in turn %d!", i, turn);
             readline.close();
@@ -106,7 +108,6 @@ var nextTurn = function() {
             var out = JSON.parse(stdout);
             debug("player " + i + " output:");
             debug(out);
-            debug();
             responses[i] = out.response;
             if (out.data !== undefined || out.data !== null) inputs[i].data = out.data
             inputs[i].responses.push(out.response);
@@ -122,6 +123,7 @@ var nextTurn = function() {
                 readline.close();
               }
             }
+            debug();
           }
         });
         debug("player " + i + " input:");
@@ -129,7 +131,7 @@ var nextTurn = function() {
         debug();
         child.stdin.write(JSON.stringify(inputs[i]));
         child.stdin.end();
-      })(i);
+      })(i, Date.now());
     } else ++finished;
   }
 }
