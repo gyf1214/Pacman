@@ -8,8 +8,8 @@ global.greedy = (game, nav, me) ->
   times = 500
 
   dMix = 8
-  sMix = 0.9
-  lMix = 0.9
+  sMix = 1.8
+  lMix = 1.8
   gMix = 0.9
 
   rev = (a) ->
